@@ -43,8 +43,8 @@ router.route('/').get(ensureAuthenticated, (req, res) => {
 })
 
 // Registration route
-router.route('/register').get((req, res) => {
-    res.render('register', {title: 'Register'})
+router.route('/register').get(forwardAuthenticated, (req, res) => {
+    res.render('register', {title: 'Register', user: null})
 })
 
 router.route('/register').post(upload.single('photo'), (req, res) => {
@@ -73,8 +73,8 @@ router.route('/register').post(upload.single('photo'), (req, res) => {
                 })
 
                 user.save().then(user => {
-                    console.log(user)
                     console.log(user.slug)
+                    res.render('dashboard', {title: user.name, user: user})
                 }).catch(err => console.log(err))
             }
         }
@@ -82,9 +82,11 @@ router.route('/register').post(upload.single('photo'), (req, res) => {
     
 })
 
+
+
 // Login Route
-router.route('/login').get((req, res) => {
-    res.render('login', {title: 'Login'})
+router.route('/login').get(forwardAuthenticated, (req, res) => {
+    res.render('login', {title: 'Login', user: null})
 })
 
 router.route('/login').post((req, res, next) => {
@@ -105,10 +107,17 @@ router.route('/:slug/dashboard').get(ensureAuthenticated, (req, res) => {
             console.log('Invalid URL')
             res.send('404 not found')
         }else{
-            res.render('dashboard', {title: user.name, user})
+            res.render('dashboard', {title: user.name, user: user})
         }
     }).catch(err => console.log(err))
     
+})
+
+
+// logout route
+router.route('/logout').get((req, res) => {
+    req.logout()
+    res.redirect('/')
 })
 
 module.exports = router

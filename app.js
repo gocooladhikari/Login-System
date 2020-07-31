@@ -46,7 +46,13 @@ app.use('/user', require('./routes/user'))
 
 
 app.get('/', (req, res) => {
-    res.send('Homepage')
+
+    if(req.isAuthenticated()){
+        res.render('home', {title: 'Task-1', user: req.user})
+    }else{
+        res.render('home', {title: 'Task-1', user: null})
+    }
+    
 })
 
 const PORT = process.env.PORT || 3000
