@@ -36,7 +36,7 @@ const upload = multer({
 // Routes
 
 // Display All route
-router.route('/').get(ensureAuthenticated, (req, res) => {
+router.route('/').get( (req, res) => {
     User.find().then(user => {
         res.send(user)
     }).catch(err => console.log(err)) 
@@ -48,9 +48,17 @@ router.route('/register').get(forwardAuthenticated, (req, res) => {
 })
 
 router.route('/register').post(upload.single('photo'), (req, res) => {
-    const{name, address, contact, education, job, email, password, password2} = req.body
+    var {name, address, contact, education, job, email, birthday, password, password2} = req.body
     const slug = slugify(name, {lower: true, strict: true})
     const photo = req.file.path.replace(/\\/g, '/')
+
+    // Birthday calculation
+    // var d = birthday
+    // var day = d.getDate()
+    // var month = d.getMonth() + 1
+    // var year = d.getYear()
+    // var date = day + "/" + month + "/" + year
+    // var birthday = date
 
     // console.log(photo)
     User.findOne({email}).then(user => {
@@ -66,6 +74,7 @@ router.route('/register').post(upload.single('photo'), (req, res) => {
                     contact,
                     education,
                     job,
+                    birthday,
                     email,
                     password,
                     slug,
@@ -73,8 +82,15 @@ router.route('/register').post(upload.single('photo'), (req, res) => {
                 })
 
                 user.save().then(user => {
-                    console.log(user.slug)
+                    if(!user){
+                        res.send('Error')
+                    }else{
+                        console.log(user.slug)
+                        console.log(birthday)
                     res.render('dashboard', {title: user.name, user: user})
+                    }
+
+                    
                 }).catch(err => console.log(err))
             }
         }

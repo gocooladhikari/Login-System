@@ -55,6 +55,18 @@ app.get('/', (req, res) => {
     
 })
 
+app.get('/time', (req, res) => {
+    // res.render('time', {title: 'Time', user: null})
+    var d = new Date()
+    var day = d.getDate()
+    var month = d.getMonth() + 1
+    var year = d.getFullYear()
+    var date = day + '/' + month + '/' + year
+
+    console.log(d)
+    console.log(date)
+})
+
 const PORT = process.env.PORT || 3000
 
 app.listen(PORT, () => {

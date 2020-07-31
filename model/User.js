@@ -23,7 +23,8 @@ const userSchema = new Schema({
         type: String
     },
     birthday: {
-        type: String
+        type: Date,
+        trim: true
     },
     job: {
         type: String
