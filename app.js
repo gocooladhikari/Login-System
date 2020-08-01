@@ -4,6 +4,8 @@ const mongoose = require('mongoose')
 const passport = require('passport')
 const session = require('express-session')
 const expresslayout = require('express-ejs-layouts')
+const User = require('./model/User')
+const path = require('path')
 require('dotenv').config()
 
 // Passport Config
@@ -21,7 +23,8 @@ app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({extended: true}))
 
 // Static directory
-app.use(express.static(__dirname + '/public'))
+app.use(express.static(path.join(__dirname, 'public')))
+
 
 // EJS and ejs layout setup
 app.use(expresslayout)
@@ -51,8 +54,26 @@ app.get('/', (req, res) => {
         res.render('home', {title: 'Task-1', user: req.user})
     }else{
         res.render('home', {title: 'Task-1', user: null})
+
     }
     
+})
+
+
+// ({$or: [{'education' : {$regex: q, $options: 'i'}}, {'name' : {$regex: q, $options: 'i'}}]})
+
+app.get('/search/', (req, res) => {
+    var q = req.query.name
+
+    User.find({$or: [{'education' : {$regex: q, $options: 'i'}}, {'name' : {$regex: q, $options: 'i'}}]}).then(data => {
+        if(!data){
+            res.send('No data')
+        }else{
+            console.log(q)
+            res.send(data)
+        }
+        
+    }).catch(err => console.log(err))
 })
 
 app.get('/time', (req, res) => {

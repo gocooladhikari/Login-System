@@ -99,7 +99,6 @@ router.route('/register').post(upload.single('photo'), (req, res) => {
 })
 
 
-
 // Login Route
 router.route('/login').get(forwardAuthenticated, (req, res) => {
     res.render('login', {title: 'Login', user: null})
@@ -110,9 +109,9 @@ router.route('/login').post((req, res, next) => {
     User.findOne({email}).then((user) => {
         passport.authenticate('local', {
             successRedirect: `/user/${user.slug}/dashboard`,
-            failureRedirect: '/user/'
+            failureRedirect: '/user/register'
         })(req, res, next)
-    })
+    }).catch(err => console.log(err))
 })
 
 // User Dashboard
@@ -127,6 +126,17 @@ router.route('/:slug/dashboard').get(ensureAuthenticated, (req, res) => {
         }
     }).catch(err => console.log(err))
     
+})
+
+// Searched users
+router.route('/:slug').get((req, res) => {
+    User.findOne({slug: req.params.slug}).then(user => {
+        if(!user){
+            console.log('No data found')
+        }else{
+            res.render('user', {title: user.name, user})
+        }
+    })
 })
 
 

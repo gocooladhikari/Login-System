@@ -3,3 +3,110 @@
     Contact: <%= user.contact %>
     DOB: <%= user.birthday.toISOString().split('T')[0] %>
 </h1>
+
+
+<div class="container ">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+
+        <form class="form-inline my-0 my-lg-0">
+            <div class="group">
+              <input aria-label="Search" style="width: 100%;" class="form-control mr-sm-5" onkeyup="showResults(this.value)" placeholder="Search names and qualifications" type="search"/>
+              <span class="highlight">
+              </span>
+              <!-- <span class="bar">
+              </span> -->
+            </div>
+            
+            <!-- <button class="btn btn-dark my-2 my-sm-0" type="submit">
+              Search
+            </button> -->
+            
+            <div style="position: relative;width: 100%;top:-1px">
+              <div class="border" id="search-results">
+              </div>
+            </div>
+          </form>
+
+      </div>
+    </div>
+  </div> 
+
+
+
+  <!-- Autocomplete Name script -->
+
+  <script type="text/javascript">
+
+    var showResults = debounce(function (arg) {
+    var value = arg.trim();
+    if (value == "" || value.length <= 0) {
+      $("#search-results").fadeOut()
+      return;
+    } else {
+      $("#search-results").fadeIn()
+    }
+    $.get('/search?name=' + value, function (data) {
+        $("#search-results").html("")
+    })
+    .done(function (data) {
+        if (data.length === 0) {
+          $("#search-results").append('<p class="lead text-center mt-2">No results</p>')
+        } else {
+          console.table(data)
+          $("#search-results").append('<p class="text-center m-0 lead">Names and Qualifications</p>')
+          data.forEach(x => {
+            $("#search-results").append('<a href="/user/'+ x.slug +'" ><p class="m-2 mt-0 lead">' + x.name +  '</p> </a>');
+            $("#search-results").append('<a href="/user/'+ x.slug +'"><p class="m-2 mt-0 lead">' + x.education + '</p> </a>');
+          })
+        }
+    })
+      .fail(function (err) {
+        console.log(err)
+      })
+  }, 300)
+
+//   var showEducation = debounce(function (arg) {
+//     var value = arg.trim();
+//     if (value == "" || value.length <= 0) {
+//       $("#search-results").fadeOut()
+//       return;
+//     } else {
+//       $("#search-results").fadeIn()
+//     }
+//     $.get('/search?name=' + value, function (data) {
+//         $("#search-results").html("")
+//     })
+//     .done(function (data) {
+//         if (data.length === 0) {
+//           $("#search-results").append('<p class="lead text-center mt-2">No results</p>')
+//         } else {
+//           console.table(data)
+//           $("#search-results").append('<p class="text-center m-0 lead">Names</p>')
+//           data.forEach(x => {
+//             $("#search-results").append('<a href="#"><p class="m-2 mt-0 lead">' + x.education + '</p> </a>');
+//           })
+//         }
+//     })
+//       .fail(function (err) {
+//         console.log(err)
+//       })
+//   }, 300)
+  
+  
+  function debounce(func, wait, immediate) {
+    var timeout;
+    return function () {
+      var context = this,
+        args = arguments;
+      var later = function () {
+        timeout = null;
+        if (!immediate) func.apply(context, args);
+      };
+      var callNow = immediate && !timeout;
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+      if (callNow) func.apply(context, args);
+    };
+  };
+</script>
